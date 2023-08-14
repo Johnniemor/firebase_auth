@@ -1,16 +1,30 @@
 import 'package:auth_app/constant/image_constant.dart';
 import 'package:auth_app/features/auth/cubit/auth_cubit.dart';
 import 'package:auth_app/features/auth/screens/login_screen.dart';
+import 'package:auth_app/features/auth/widgets/custom_password_textField.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class RegisterScreen extends StatelessWidget {
-  RegisterScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
+  @override
+  State<RegisterScreen> createState() => _RegisterScreenState();
+}
+
+class _RegisterScreenState extends State<RegisterScreen> {
   final _fromKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+
+  bool hintText = true;
+
+  void _onHintText() {
+    setState(() {
+      hintText = !hintText;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -20,14 +34,26 @@ class RegisterScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => LoginScreen(),
+              builder: (context) => const LoginScreen(),
             ),
           );
         } else if (state is AuthFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage),
-            ),
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Warning"),
+                content: Text(state.errorMessage),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Try again"),
+                  ),
+                ],
+              );
+            },
           );
         }
       },
@@ -83,46 +109,37 @@ class RegisterScreen extends StatelessWidget {
                                   ),
                                   hintText: 'Email address',
                                 ),
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return "Please enter your email or password.";
-                                  }
-                                  return null;
-                                },
-                              ),
-                              const SizedBox(height: 10),
-                              TextFormField(
-                                controller: _passwordController,
-                                obscureText: true,
-                                style: const TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  errorBorder: const OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.red),
-                                  ),
-                                  hintText: 'Password',
-                                ),
                                 validator: _validateEmail,
                               ),
                               const SizedBox(height: 10),
-                              TextFormField(
+                              CustomPasswordFormField(
+                                hintText: 'Password',
+                                obscureText: hintText,
+                                keyboardType: TextInputType.text,
+                                controller: _passwordController,
+                                iconButton: IconButton(
+                                  onPressed: _onHintText,
+                                  icon: Icon(
+                                    hintText
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
+                                  ),
+                                ),
+                                validator: _validatePassword,
+                              ),
+                              const SizedBox(height: 10),
+                              CustomPasswordFormField(
+                                hintText: 'Confirm Password',
+                                obscureText: hintText,
+                                keyboardType: TextInputType.text,
                                 controller: _confirmPasswordController,
-                                obscureText: true,
-                                style: const TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                iconButton: IconButton(
+                                  onPressed: _onHintText,
+                                  icon: Icon(
+                                    hintText
+                                        ? Icons.visibility
+                                        : Icons.visibility_off,
                                   ),
-                                  errorBorder: const OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.red),
-                                  ),
-                                  hintText: 'Confirm Password',
                                 ),
                                 validator: _validatePassword,
                               ),
@@ -131,6 +148,11 @@ class RegisterScreen extends StatelessWidget {
                                 width: MediaQuery.of(context).size.width,
                                 height: 50,
                                 child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                  ),
                                   onPressed: () {
                                     if (_fromKey.currentState!.validate()) {
                                       final email =
@@ -138,9 +160,10 @@ class RegisterScreen extends StatelessWidget {
                                       final password =
                                           _passwordController.text.trim();
 
-                                      context
-                                          .read<AuthCubit>()
-                                          .register(email, password);
+                                      context.read<AuthCubit>().register(
+                                            email,
+                                            password,
+                                          );
                                     }
                                   },
                                   child: const Text(
@@ -172,7 +195,8 @@ class RegisterScreen extends StatelessWidget {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => LoginScreen(),
+                                          builder: (context) =>
+                                              const LoginScreen(),
                                         ),
                                       );
                                     },

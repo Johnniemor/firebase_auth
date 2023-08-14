@@ -1,5 +1,6 @@
 import 'package:auth_app/features/auth/cubit/auth_cubit.dart';
 import 'package:auth_app/features/auth/screens/login_screen.dart';
+import 'package:auth_app/features/reset_password/cubit/reset_password_cubit.dart';
 import 'package:auth_app/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -17,9 +18,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<AuthCubit>(
-      create: (context) => AuthCubit(),
-      child: MaterialApp(home: LoginScreen()),
-    );
+    return MultiBlocProvider(
+        providers: [
+          BlocProvider<AuthCubit>(
+            create: (context) => AuthCubit(),
+          ),
+          BlocProvider<ResetPasswordCubit>(
+            create: (context) => ResetPasswordCubit(),
+          ),
+        ],
+        child: const MaterialApp(
+          home: LoginScreen(),
+        ));
   }
 }

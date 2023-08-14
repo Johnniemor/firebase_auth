@@ -2,15 +2,32 @@ import 'package:auth_app/constant/image_constant.dart';
 import 'package:auth_app/features/auth/cubit/auth_cubit.dart';
 import 'package:auth_app/features/auth/screens/home_screen.dart';
 import 'package:auth_app/features/auth/screens/register_screen.dart';
+import 'package:auth_app/features/auth/widgets/custom_password_textField.dart';
+import 'package:auth_app/features/reset_password/screens/reset_password_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
+
   final _emailController = TextEditingController();
+
   final _passwordController = TextEditingController();
+
+  bool hintText = true;
+
+  void _onHintText() {
+    setState(() {
+      hintText = !hintText;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,10 +41,22 @@ class LoginScreen extends StatelessWidget {
             ),
           );
         } else if (state is AuthFailure) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage),
-            ),
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                title: const Text("Warning"),
+                content: const Text("Invalid email or password"),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Try again"),
+                  ),
+                ],
+              );
+            },
           );
         }
       },
@@ -86,27 +115,31 @@ class LoginScreen extends StatelessWidget {
                                 validator: _validateEmail,
                               ),
                               const SizedBox(height: 10),
-                              TextFormField(
-                                controller: _passwordController,
-                                obscureText: true,
-                                style: const TextStyle(color: Colors.black),
-                                decoration: InputDecoration(
-                                  filled: true,
-                                  fillColor: Colors.white,
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  errorBorder: const OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.red),
-                                  ),
+                              CustomPasswordFormField(
+                                  controller: _passwordController,
+                                  keyboardType: TextInputType.text,
                                   hintText: 'Password',
-                                ),
-                                validator: _validatePassword,
-                              ),
+                                  obscureText: hintText,
+                                  iconButton: IconButton(
+                                    onPressed: _onHintText,
+                                    icon: Icon(
+                                      hintText
+                                          ? Icons.visibility
+                                          : Icons.visibility_off,
+                                    ),
+                                  ),
+                                  validator: _validatePassword),
                               const SizedBox(height: 20),
                               TextButton(
                                 onPressed: () {
                                   // ToDo: Forget password Future.
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          ResetPasswordScreen(),
+                                    ),
+                                  );
                                 },
                                 child: const Text(
                                   "Forget your password?",
@@ -118,6 +151,11 @@ class LoginScreen extends StatelessWidget {
                                 width: MediaQuery.of(context).size.width,
                                 height: 50,
                                 child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30.0),
+                                    ),
+                                  ),
                                   onPressed: () {
                                     if (_formKey.currentState!.validate()) {
                                       final email =
@@ -147,18 +185,20 @@ class LoginScreen extends StatelessWidget {
                               TextButton(
                                 onPressed: () {
                                   // ToDo: Login with facebook future.
+                                  BlocProvider.of<AuthCubit>(context)
+                                      .signInWithGoogle();
                                 },
                                 child: const Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     Image(
-                                      image: AssetImage(
-                                          ImageConstant.facebookIcon),
+                                      image:
+                                          AssetImage(ImageConstant.googleIcon),
                                       height: 20,
                                     ),
                                     SizedBox(width: 10),
                                     Text(
-                                      "Continue as Facebook",
+                                      "Continue as Google",
                                       style: TextStyle(color: Colors.white),
                                     ),
                                   ],
