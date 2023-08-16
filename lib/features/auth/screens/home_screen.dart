@@ -1,9 +1,9 @@
 import 'package:auth_app/constant/image_constant.dart';
 import 'package:auth_app/features/auth/cubit/auth_cubit.dart';
-import 'package:auth_app/features/auth/screens/login_screen.dart';
-import 'package:auth_app/features/user_profile/screen.dart/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../user_profile/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});

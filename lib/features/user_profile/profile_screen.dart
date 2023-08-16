@@ -1,9 +1,10 @@
-import 'package:auth_app/features/user_profile/widgets/custom_upload_image_profile.dart';
+import 'package:auth_app/features/user_profile/user_account/user_account_screen.dart';
+import 'package:auth_app/features/user_profile/widgets/custom_menu_button.dart';
 
-import '../../../constant/image_constant.dart';
-import '../../auth/cubit/auth_cubit.dart';
-import '../widgets/custom_confirm_dialog.dart';
-import '../widgets/custom_user_profile_image.dart';
+import '../../constant/image_constant.dart';
+import '../auth/cubit/auth_cubit.dart';
+import 'widgets/custom_confirm_dialog.dart';
+import 'widgets/custom_user_profile_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -48,19 +49,6 @@ class ProfileScreen extends StatelessWidget {
                     ),
                     const CustomUserImageProfile(),
                     Positioned(
-                      top: 210,
-                      right: 140,
-                      child: CircleAvatar(
-                        child: IconButton(
-                          onPressed: () => customUploadImageProfile(
-                            context: context,
-                            onSelectImage: (p0) {},
-                          ),
-                          icon: const Icon(Icons.camera_alt),
-                        ),
-                      ),
-                    ),
-                    Positioned(
                       top: 270,
                       child: state.user?.displayName == ""
                           ? Text(
@@ -95,18 +83,45 @@ class ProfileScreen extends StatelessWidget {
                     Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
+                        CustomMenuButton(
+                          title: 'My account',
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => UserAccountScreen(),
+                            ),
+                          ),
+                        ),
                         Padding(
                           padding: const EdgeInsets.all(10.0),
-                          child: SizedBox(
-                            width: size.width,
-                            height: 50,
-                            child: ElevatedButton(
-                              style: const ButtonStyle(
-                                backgroundColor:
-                                    MaterialStatePropertyAll(Colors.red),
+                          child: GestureDetector(
+                            onTap: () => customConfirmDialog(context),
+                            child: Container(
+                              width: size.width,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.black.withOpacity(0.5),
+                                      spreadRadius: 2,
+                                      blurRadius: 5,
+                                      offset: const Offset(0, 3),
+                                    )
+                                  ],
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(15.0),
+                                  ),
+                                  color: Colors.red),
+                              child: const Center(
+                                child: Text(
+                                  "Log Out",
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
-                              onPressed: () => customConfirmDialog(context),
-                              child: const Text("Log Out"),
                             ),
                           ),
                         ),

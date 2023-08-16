@@ -63,6 +63,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '221094328930',
     projectId: 'my-auth-app-98f88',
     storageBucket: 'my-auth-app-98f88.appspot.com',
+    androidClientId: '221094328930-lvbvjvsig2o6bs7qbokn0s4u0p16oo9d.apps.googleusercontent.com',
     iosClientId: '221094328930-n15vfga13ea7f2lmmkk5s673qk397p9h.apps.googleusercontent.com',
     iosBundleId: 'com.example.authApp',
   );
